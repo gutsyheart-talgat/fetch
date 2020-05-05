@@ -64,7 +64,7 @@ renderTaskList = () => {
     const list = createEl('ul', null, {id:'list'})
     document.body.appendChild(list)
     fetchGetTask()
-      .then(tasklist = tasklist.forEach((item) => renderTask(item,list)))
+      .then(tasklist => tasklist.forEach((item) => renderTask(item,list)))
 } // не могу правльно написать этот код для перерисовки
 
 renderTaskList()
