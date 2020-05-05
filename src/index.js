@@ -5,10 +5,21 @@ const addBtn = document.querySelector('.addBtn')
 
 addBtn.addEventListener('click', () =>{
     fetchAddTask({text: input.value})
+     .then(() => renderTask())
 
 })
+const createEl = (tag, text, attrs = {}) => {
+    const el = document.createElement(tag)
+    el.textContent = text
+    Object.keys(attrs).forEach((key) => {
+      el.setAttribute(key, attrs[key])
+    })
+    return el
+  }
 
-const renderTask = (task) => {
+
+
+const renderTask = (task,list) => {
     const li = document.createElement('li')
     const text = createEl('div', task.text, { class: task.done ? 'text done' : 'text' })
 
@@ -35,7 +46,7 @@ const renderTask = (task) => {
       })
 
 
-    li.setAttribute('data-number', task.id)
+    
 
     if(task.done) li.classList.add('done')
     li.appendChild(text)
@@ -44,15 +55,30 @@ const renderTask = (task) => {
     li.appendChild(editBtn)
    
 }
+const fetchGetTask = () =>{
+    return fetch('http://localhost:3000/list')
+       .then(response => response.json())
+}
+
+renderTaskList = () => {
+    const list = createEl('ul', null, {id:'list'})
+    document.body.appendChild(list)
+    fetchGetTask()
+      .then(tasklist = tasklist.forEach((item) => renderTask(item,list)))
+} // не могу правльно написать этот код для перерисовки
+
+renderTaskList()
 
 
-fetch('http://localhost:3000/list')
-.then(response =>{
-    return response.json()
-})
-.then(tasklist =>{
-    tasklist.forEach(renderTask)
-})
+// fetch('http://localhost:3000/list')
+// .then(response =>{
+//     return response.json()
+// })
+// .then(tasklist =>{
+//     tasklist.forEach(renderTask)
+// })
+
+
 
 
 
@@ -65,7 +91,6 @@ const fetchAddTask = (body) => {
 } 
 
 const fetchEditTask = (id, body) => {
-    console.log(id,body)
     return fetch(`http://localhost:3000/edit/${id}`, {
      method : 'PUT',
      headers :{ 'Content-Type': 'application/json' },
@@ -78,12 +103,3 @@ const fetchDeleteTask = (id) => {
     
 })
 }
-const createEl = (tag, text, attrs = {}) => {
-    const el = document.createElement(tag)
-    el.textContent = text
-    // цикл по атрибутам из агрументов функции и их назначение
-    Object.keys(attrs).forEach((key) => {
-      el.setAttribute(key, attrs[key])
-    })
-    return el
-  }
