@@ -1,14 +1,4 @@
-const block2 = document.querySelector('.block-2')
-const createBtn = document.querySelector('.create-btn')
-const textName = document.querySelector('.text-name')
-const textContent = document.querySelector('.text-content')
-const row = document.querySelector('.second-row')
-const errorCont = document.querySelector('.error-cont')
-const colorbtn = document.querySelectorAll('.color')
-
-
-
-
+import {addTask, deleteTask, getTask,editTask} from './api'
 
 const createEl = (tag, text, attrs = {}) => {
     const el = document.createElement(tag)
@@ -18,6 +8,14 @@ const createEl = (tag, text, attrs = {}) => {
     })
     return el
 }
+
+const block2 = document.querySelector('.block-2')
+const createBtn = document.querySelector('.create-btn')
+const textName = document.querySelector('.text-name')
+const textContent = document.querySelector('.text-content')
+const row = document.querySelector('.second-row')
+const errorCont = document.querySelector('.error-cont')
+const colorbtn = document.querySelectorAll('.color')
 const errImg = createEl('img', null, {class:'error-img'})
 const errorMsg = createEl('div', null, {class:"error-msg"})
 const errorText = createEl('div', null, {class: "error"})
@@ -41,24 +39,6 @@ createBtn.addEventListener('click', function(){
     })
 })
 
-function addTask(body) {
-    return fetch('http://localhost:5555/add', {
-     method : 'POST',
-     headers :{ 'Content-Type': 'application/json' },
-     body : JSON.stringify(body),
-    })
-    .then(response => {
-        if(!response.ok) throw new Error('Не удалось создать заметку!')
-    })
-} 
-function deleteTask(id) {
-    return fetch(`http://localhost:5555/delete/${id}`, {
-     method : 'DELETE',
-    })
-    .then(response => {
-        if(!response.ok) throw new Error('Ошибка удаления!')
-    })
-}
 const renderTask = (task,col) => {
     const item = createEl('div', null, {
         class: 'items mt-5 mb-5'
@@ -135,23 +115,6 @@ const renderTask = (task,col) => {
     })
 
     console.log()
-}
-function getTask() {
-    return fetch('http://localhost:5555/list')
-       .then(response => {
-           if(!response.ok) throw new Error('Ошибка загрузки!')
-           return response.json()
-       })
-}
-function editTask(id, body) {
-    return fetch(`http://localhost:5555/edit/${id}`, {
-     method : 'PUT',
-     headers :{ 'Content-Type': 'application/json' },
-     body : JSON.stringify(body)
-    })
-    .then(response => {
-    if(!response.ok) throw new Error('Ошибка изменения!')
-    })
 }
 
 renderTaskList = () => {
