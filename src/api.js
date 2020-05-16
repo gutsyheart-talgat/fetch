@@ -1,4 +1,4 @@
-export const addTask =(body) => {
+export const addTask = (body) => {
     return fetch('http://localhost:5555/add', {
      method : 'POST',
      headers :{ 'Content-Type': 'application/json' },
@@ -8,7 +8,7 @@ export const addTask =(body) => {
         if(!response.ok) throw new Error('Не удалось создать заметку!')
     })
 } 
-export const deleteTask =(id) {
+export const deleteTask =(id)=> {
     return fetch(`http://localhost:5555/delete/${id}`, {
      method : 'DELETE',
     })
