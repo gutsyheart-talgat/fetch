@@ -1,0 +1,52 @@
+@import url(./crete.css);
+@import url(./statistica.css);
+@import url(./items.css);
+@import url(./click.css);
+:root{
+    --blue:#92AED9 ;
+    --green:#57AD56;
+    --grey:#BFBFBF;
+    --white:#FFFBE3;
+    --pink: #FFD2D2;
+    --seryi:#D3D2FF;
+    --salad: #D7FDD1;
+    --bej:#F8E1B6;
+    --belyi:#ffffff;
+}
+body{
+    background: var(--blue);
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+}
+.content-header{
+    background-color:var(--blue) ;
+    height: 61px;
+}
+.header{
+    justify-content: space-between;
+    color: var(--belyi);
+    align-items: center;
+}
+.header-h1{
+    font-weight: 800;
+    font-size: 50px;
+    line-height: 61px;
+}
+.header-p{
+    font-weight: 800;
+    font-size: 16px;
+    line-height: 20px;
+}
+.content{
+    background-color: var(--blue);
+}
+
+.icons{
+    width: 30px;
+    height: 30px;
+}
+.block-2{
+    width: 100%;
+    min-height:109px;
+    background:var(--blue) ;
+}

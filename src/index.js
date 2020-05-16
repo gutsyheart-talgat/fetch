@@ -1,13 +1,15 @@
-const list = document.querySelector('#list')
+const block2 = document.querySelector('.block-2')
+const createBtn = document.querySelector('.create-btn')
+const textName = document.querySelector('.text-name')
+const textContent = document.querySelector('.text-content')
+const row = document.querySelector('.second-row')
+const errorCont = document.querySelector('.error-cont')
+const colorbtn = document.querySelectorAll('.color')
 
-const input = document.querySelector('.input')
-const addBtn = document.querySelector('.addBtn')
 
-addBtn.addEventListener('click', () =>{
-    fetchAddTask({text: input.value})
-     .then(() => renderTask())
 
-})
+
+
 const createEl = (tag, text, attrs = {}) => {
     const el = document.createElement(tag)
     el.textContent = text
@@ -15,91 +17,160 @@ const createEl = (tag, text, attrs = {}) => {
       el.setAttribute(key, attrs[key])
     })
     return el
-  }
+}
+const errImg = createEl('img', null, {class:'error-img'})
+const errorMsg = createEl('div', null, {class:"error-msg"})
+const errorText = createEl('div', null, {class: "error"})
 
+createBtn.addEventListener('click', function(){
+    colorbtn.forEach(function(color){
+        addTask({
+            text: textName.value,
+            desc: textContent.value,
+            color: color.value
+        })
+            .then(() => {
+                renderTaskList()
+            })
+            .catch((err) => {
+                errorMsg.appendChild(errImg);
+                errorText.textContent = err.message;
+                errorMsg.appendChild(errorText);
+                errorCont.appendChild(errorMsg)
+            })
+    })
+})
 
+function addTask(body) {
+    return fetch('http://localhost:5555/add', {
+     method : 'POST',
+     headers :{ 'Content-Type': 'application/json' },
+     body : JSON.stringify(body),
+    })
+    .then(response => {
+        if(!response.ok) throw new Error('Не удалось создать заметку!')
+    })
+} 
+function deleteTask(id) {
+    return fetch(`http://localhost:5555/delete/${id}`, {
+     method : 'DELETE',
+    })
+    .then(response => {
+        if(!response.ok) throw new Error('Ошибка удаления!')
+    })
+}
+const renderTask = (task,col) => {
+    const item = createEl('div', null, {
+        class: 'items mt-5 mb-5'
+    });
+    const container = document.createElement('div')
+    container.classList.add('item-container')
+    const header = document.createElement('header')
+    header.classList.add('item-header')
+    const headH1 = document.createElement('h1')
+    headH1.classList.add('name-do')
+    headH1.textContent = task.text
+    const check = document.createElement('button')
+    check.classList.add('check')
+    check.addEventListener('click', function(){
+        editTask(task.id, getDoneInfo)
+            .then(() => {
+                col.remove()
+                col.classList.toggle('checked')
+            })
+    })
+    const getDoneInfo = task.done ? {
+        'done': false
+    } : {
+        'done': true
+    }
+    const main = document.createElement('main')
+    const mainP = document.createElement('p')
+    mainP.textContent = task.desc
+    const footer = document.createElement('footer')
+    footer.classList.add('item-footer')
+    const colors = document.createElement('div')
+    for(let i = 0; i < 5; i++){
+        const color = document.createElement('button')
+        color.classList.add('color-btn')
+        color.classList.add(`color-${i+1}`)
+        const cveta = [
+            '#FFFBE3',
+            '#FFD2D2',
+            '#D3D2FF',
+            '#D7FDD1',
+            '#F8E1B6',
+        ]
+        color.addEventListener('click', function(){
+            item.style.background = cveta[i]
+            color.classList.toggle('clicked')
+        })
+        colors.appendChild(color)
+    }
+    const deletebtn = document.createElement('button')
+    deletebtn.classList.add('urna')
 
-const renderTask = (task,list) => {
-    const li = document.createElement('li')
-    const text = createEl('div', task.text, { class: task.done ? 'text done' : 'text' })
+    item.style.background = task.color
 
-    const deleteBtn = document.createElement('button')
-    deleteBtn.textContent = 'Удалить'
-    deleteBtn.addEventListener('click', ()=>{
-        fetchDeleteTask(task.id)
+    block2.appendChild(row)
+    row.appendChild(col)
+    col.appendChild(item)
+    item.appendChild(container)
+    container.appendChild(header)
+    container.appendChild(main)
+    container.appendChild(footer)
+    header.appendChild(headH1)
+    header.appendChild(check)
+    main.appendChild(mainP)
+    footer.appendChild(colors)
+    footer.appendChild(deletebtn)
+
+    deletebtn.addEventListener('click', function(){
+        deleteTask(task.id)
+            .then(() => {
+                col.remove()
+                renderTaskList()
+            })
+    
     })
 
-    const editBtn = document.createElement('button')
-    editBtn.textContent = 'Изменить'
-    editBtn.addEventListener('click', () => {
-        const input = document.createElement('input')
-        input.type = 'text'
-        input.value = task.text
-        editBtn.disabled = true
-        li.insertBefore(input, text)
-        li.removeChild(text)
-        input.addEventListener('blur', () => {
-          // запрос на бэкенд PUT /edit/:id
-          fetchEditTask(task.id, { text: input.value })
-          // при успешном ответе страница перезагружается
-        })
-      })
-
-
-    
-
-    if(task.done) li.classList.add('done')
-    li.appendChild(text)
-    list.appendChild(li)
-    li.appendChild(deleteBtn)
-    li.appendChild(editBtn)
-   
+    console.log()
 }
-const fetchGetTask = () =>{
-    return fetch('http://localhost:3000/list')
-       .then(response => response.json())
+function getTask() {
+    return fetch('http://localhost:5555/list')
+       .then(response => {
+           if(!response.ok) throw new Error('Ошибка загрузки!')
+           return response.json()
+       })
+}
+function editTask(id, body) {
+    return fetch(`http://localhost:5555/edit/${id}`, {
+     method : 'PUT',
+     headers :{ 'Content-Type': 'application/json' },
+     body : JSON.stringify(body)
+    })
+    .then(response => {
+    if(!response.ok) throw new Error('Ошибка изменения!')
+    })
 }
 
 renderTaskList = () => {
-    const list = createEl('ul', null, {id:'list'})
-    document.body.appendChild(list)
-    fetchGetTask()
-      .then(tasklist => tasklist.forEach((item) => renderTask(item,list)))
-} // не могу правльно написать этот код для перерисовки
+    const col = createEl('div', null, {
+        class: 'col-12 col-md-6 col-lg-3'
+    });
+    getTask()
+      .then(tasklist => tasklist.forEach((item) => renderTask(item,col)))
+      .catch((err) => {
+        console.log(err.message)
+        const divErr = createEl('div', err.message, {
+            class: "error"
+        })
+        col.appendChild(divErr)
+      })
+}
 
 renderTaskList()
 
 
-// fetch('http://localhost:3000/list')
-// .then(response =>{
-//     return response.json()
-// })
-// .then(tasklist =>{
-//     tasklist.forEach(renderTask)
-// })
 
 
-
-
-
-const fetchAddTask = (body) => {
-    return fetch('http://localhost:3000/add', {
-     method : 'POST',
-     headers :{ 'Content-Type': 'application/json' },
-     body : JSON.stringify(body),
-})
-} 
-
-const fetchEditTask = (id, body) => {
-    return fetch(`http://localhost:3000/edit/${id}`, {
-     method : 'PUT',
-     headers :{ 'Content-Type': 'application/json' },
-     body : JSON.stringify(body)
-})
-}
-const fetchDeleteTask = (id) => {
-    return fetch(`http://localhost:3000/delete/${id}`, {
-     method : 'DELETE',
-    
-})
-}
