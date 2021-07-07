@@ -1,0 +1,6 @@
+.clicked{
+    border: 1px solid black;
+}
+.checked{
+    text-decoration: line-through;
+}
